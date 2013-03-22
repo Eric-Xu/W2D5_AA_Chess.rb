@@ -63,19 +63,26 @@ class Player
 	  start_coord, end_coord = get_user_input
 
 	  # REPLACED: piece = @board.board[ start_coord[0] ][ start_coord[1] ]
-	  chosen_coord = @board[ start_coord[0], start_coord[1] ]
+	  chosen_piece = @board[ start_coord[0], start_coord[1] ]
 
-	  if chosen_coord == "___"  
+	  if chosen_piece == "___"  
 	  	puts "Please select a non-empty coordinate"
         next
 	  end
 
-	  if chosen_coord.color != @color
+	  if chosen_piece.color != @color
 	  	puts "Please select a piece of the correct color"
         next
       end
 
-	  chosen_coord.move([ end_coord[0], end_coord[1] ])
+      #ask piece to return all its valid moves
+      #elsif?
+      if chosen_piece.valid_move?(end_coord) == false
+	  	puts "Invalid move! Please try again."
+        next
+      end
+
+	  chosen_piece.move([ end_coord[0], end_coord[1] ])
 	  #test
   	  break
   	end
@@ -112,13 +119,65 @@ class Piece
   
   #was called make_move in chess.rb
   def move(coord)
-  	#test
-	puts "printing #{coord} from the Piece.move method"
 	@board[ coord[0], 	  coord[1]     ] = self
 	@board[ @position[0], @position[1] ] = "___"
 	@position = coord
   end
 
+  # called in Player.move_to_coord
+  def valid_move?(end_coord)
+    valid_moves = find_valid_moves
+    puts "all valid_moves: #{valid_moves} being called from Piece. valid_move?"
+    valid_moves.include?(end_coord) ? true : false
+  end
+
+  # called in Piece.valid_move?
+  def find_valid_moves
+  	step_trans, jump_trans = initialize_trans
+  
+  	# run step_trans
+  	# if immediate is empty
+  	# add new coord to all_valid_moves
+  	# if immediate is opponent
+  	# run jump_trans
+
+  	step_trans.each do |trans|
+  	  new_coord = [ @position[0] + trans[0], @position[1] + trans[1] ]
+  	  if within_bounds?(new_coord) && immediate_space_empty?(new_coord)
+  	  	all_valid_moves << new_coord
+  	  end
+  	end
+
+  	all_valid_moves
+  end
+
+  # called in Piece.find_valid_moves
+  def initialize_trans
+  	if @color == :W
+  	  step_trans = [ [-1, -1], [-1, 1] ]
+  	  jump_trans = [ [-2, -2], [-2, 2] ]
+  	else # if player color == :B
+  	  step_trans = [ [ 1, -1], [ 1, 1] ]
+  	  jump_trans = [ [ 2, -2], [ 2, 2] ]
+  	end
+  	[step_trans, jump_trans]
+  end
+
+  # called in Piece.find_valid_moves
+  def immediate_space_empty?(coord)
+  	target_coord = @board[ coord[0], coord[1]]
+  	target_coord == "___" ? true : false
+  end
+
+  # called in Piece.find_valid_moves
+  def within_bounds?(coord)
+    if (coord[0] < 0) or (coord[0] > 7) or
+        (coord[1] < 0) or (coord[1] > 7)
+      return false
+    else
+      return true
+    end
+  end
 end
 
 class Board
