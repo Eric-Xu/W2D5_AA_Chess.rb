@@ -7,6 +7,16 @@ end
 class Piece
   # know the valid squares where it can jump to 
   # know the boundaries of the board
+
+  attr_reader :color, :board
+  attr_accessor :position
+
+  def initialize(color, position, board)
+  	@position = position
+  	@color = color
+  	@board = board
+  end
+
 end
 
 class Board
@@ -19,15 +29,6 @@ class Board
   def initialize
   	@board = [ [], [], [], [], [], [], [], [] ]
   end
-
-  # # useful?
-  # def [](row, col)
-  # 	@board[row][col]
-  # end
-
-  # def []=(row, col, value)
-  # 	@board[row][col] = value  	
-  # end
 
   def create_initial_board
   	# populate underscores for blank spaces
@@ -42,7 +43,7 @@ class Board
   						   [1, 0], [1, 2], [1, 4], [1, 6], 
   						   [2, 1], [2, 3], [2, 5], [2, 7] ]
     black_start_coords.each do |coord|
-      @board[coord[0]] [coord[1]] = "B"
+      @board[coord[0]] [coord[1]] = Piece.new(:B, coord, self)
     end
 
   	# populate white pieces
@@ -50,7 +51,7 @@ class Board
   						   [6, 1], [6, 3], [6, 5], [6, 7], 
   						   [7, 0], [7, 2], [7, 4], [7, 6] ]
     white_start_coords.each do |coord|
-      @board[coord[0]] [coord[1]] = "W"
+      @board[coord[0]] [coord[1]] = Piece.new(:W, coord, self)
     end
   end
 
@@ -62,7 +63,7 @@ class Board
         if piece == "___"
           "___"
         else
-          if piece == "W"
+          if piece.color == :W
             " W "
           else
             " B "
@@ -74,6 +75,15 @@ class Board
     end
     nil
   end
+
+  # # useful?
+  # def [](row, col)
+  # 	@board[row][col]
+  # end
+
+  # def []=(row, col, value)
+  # 	@board[row][col] = value  	
+  # end
 end
 
 class Player
