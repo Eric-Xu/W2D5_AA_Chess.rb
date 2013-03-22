@@ -20,7 +20,7 @@ class Checkers
   	  puts "White's turn"
 
   	  while true
-  	  	player1.make_move
+  	  	player1.move_to_coord
   	  	break
   	  end
 
@@ -28,7 +28,7 @@ class Checkers
   	  puts "Black's turn"
 
   	  while true
-  	  	player2.make_move
+  	  	player2.move_to_coord
   	  	break
   	  end
 
@@ -57,16 +57,25 @@ class Player
   	@color = color
   end
 
-  def make_move
+  #was called make_move in chess.rb
+  def move_to_coord
   	while true
 	  start_coord, end_coord = get_user_input
 
 	  # REPLACED: piece = @board.board[ start_coord[0] ][ start_coord[1] ]
-	  piece = @board[ start_coord[0], start_coord[1] ]
-	  #test
-	  puts "piece from inside Player.make_move: #{piece}"
-	  
-	  piece.move([ end_coord[0], end_coord[1] ])
+	  chosen_coord = @board[ start_coord[0], start_coord[1] ]
+
+	  if chosen_coord == "___"  
+	  	puts "Please select a non-empty coordinate"
+        next
+	  end
+
+	  if chosen_coord.color != @color
+	  	puts "Please select a piece of the correct color"
+        next
+      end
+
+	  chosen_coord.move([ end_coord[0], end_coord[1] ])
 	  #test
   	  break
   	end
