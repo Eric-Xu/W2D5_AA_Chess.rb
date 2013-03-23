@@ -33,8 +33,9 @@ class Checkers
   	  end
 
   	  @board.print_board
-  	  #test
-  	  game_over = true
+
+  	  # if any player runs out of possible moves
+  	  # set game_over = true
   	end
 
   	print_message("Game over")
@@ -62,8 +63,9 @@ class Player
   	while true
 	  start_coord, end_coord = get_user_input
 
-	  # REPLACED: piece = @board.board[ start_coord[0] ][ start_coord[1] ]
 	  chosen_piece = @board[ start_coord[0], start_coord[1] ]
+	  # test
+	  puts "chosen_piece #{chosen_piece} from Player.move_to_coord"
 
 	  if chosen_piece == "___"  
 	  	puts "Please select a non-empty coordinate"
@@ -73,18 +75,13 @@ class Player
 	  if chosen_piece.color != @color
 	  	puts "Please select a piece of the correct color"
         next
-      end
-
-      #ask piece to return all its valid moves
-      #elsif?
-      if chosen_piece.valid_move?(end_coord) == false
+      elsif chosen_piece.valid_move?(end_coord) == false
 	  	puts "Invalid move! Please try again."
         next
       end
 
 	  chosen_piece.move([ end_coord[0], end_coord[1] ])
-	  #test
-  	  break
+	  break
   	end
   end
 
@@ -131,20 +128,20 @@ class Piece
     valid_moves.include?(end_coord) ? true : false
   end
 
-  # called in Piece.valid_move?
+  #called in Piece.valid_move?
   def find_valid_moves
+  	all_valid_moves = []
   	step_trans, jump_trans = initialize_trans
-  
-  	# run step_trans
-  	# if immediate is empty
-  	# add new coord to all_valid_moves
-  	# if immediate is opponent
-  	# run jump_trans
 
   	step_trans.each do |trans|
   	  new_coord = [ @position[0] + trans[0], @position[1] + trans[1] ]
-  	  if within_bounds?(new_coord) && immediate_space_empty?(new_coord)
-  	  	all_valid_moves << new_coord
+  	  # if 
+  	  # add to valid moves
+  	  if !object_of_same_color?(new_coord)
+		all_valid_moves << new_coord
+	  # if adjacent move is open
+  	  elsif within_bounds?(new_coord) && immediate_space_empty?(new_coord) 
+   	  	all_valid_moves << new_coord
   	  end
   	end
 
@@ -161,6 +158,20 @@ class Piece
   	  jump_trans = [ [ 2, -2], [ 2, 2] ]
   	end
   	[step_trans, jump_trans]
+  end
+
+  # called in Piece.find_valid_moves
+  def object_of_same_color?(coord)
+  	target_coord = @board[ coord[0], coord[1]]
+    if target_coord == "___"
+      return false
+    else #there's a piece there
+      if @color == target_coord.color
+        return true
+      else
+        return false
+      end
+    end
   end
 
   # called in Piece.find_valid_moves
