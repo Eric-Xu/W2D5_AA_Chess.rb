@@ -6,39 +6,43 @@ class Checkers
 
   def initialize
   	@board = Board.new
+  	@white_player = Player.new(@board, :W)
+  	@black_player = Player.new(@board, :B)
   end
 
   def play
   	game_over = false
-  	
-  	player1 = Player.new(@board, :W)
-  	player2 = Player.new(@board, :B)
+
   	
   	@board.print_board
 
   	until game_over
   	  puts "White's turn"
-
   	  while true
-  	  	player1.move_to_coord
+  	  	@white_player.move_to_coord
   	  	break
   	  end
 
   	  @board.print_board
+   	  # if any player runs out of possible moves
+  	  # then game is over
+  	  if @board.has_won?(:W)
+  	  	print_message("White wins!")
+  	  	break
+  	  end
+
   	  puts "Black's turn"
-
   	  while true
-  	  	player2.move_to_coord
+  	  	@black_player.move_to_coord
   	  	break
   	  end
 
   	  @board.print_board
-
-  	  # if any player runs out of possible moves
-  	  # set game_over = true
+  	  if @board.has_won?(:B)
+  	  	print_message("Black wins!")
+  	  	break
+  	  end
   	end
-
-  	print_message("Game over")
   end
 
   def print_message(message)
@@ -62,10 +66,7 @@ class Player
   def move_to_coord
   	while true
 	  start_coord, end_coord = get_user_input
-
 	  chosen_piece = @board[ start_coord[0], start_coord[1] ]
-	  # test
-	  puts "chosen_piece #{chosen_piece} from Player.move_to_coord"
 
 	  if chosen_piece == "___"  
 	  	puts "Please select a non-empty coordinate"
@@ -233,6 +234,10 @@ class Board
     white_start_coords.each do |coord|
       @board[coord[0]] [coord[1]] = Piece.new(:W, coord, self)
     end
+
+    # # test pieces
+    # @board[4] [3] = Piece.new(:W, [4, 3], self)
+    # @board[2] [3] = Piece.new(:B, [2, 3], self)
   end
 
   def print_board
@@ -254,5 +259,43 @@ class Board
       puts "" #empty line
     end
     nil
+  end
+
+  # called by Checkers.play
+  def has_won?(color)
+    opp_color = nil
+    if color == :W
+      opp_color = :B
+    else
+      opp_color = :W
+    end
+
+    if !any_pieces_left?(opp_color)
+      return true
+    else
+      return false
+    end
+  end
+
+  def any_pieces_left?(color)
+    pieces = find_pieces(color)
+    if !pieces.empty?
+      true
+    else
+      false
+    end
+  end
+
+  def find_pieces(color)
+    all_pieces = []
+    @board.flatten.each do |piece|
+      if !piece.nil? and piece != "___"
+        if piece.color == color
+          all_pieces << piece
+        end
+      end
+    end
+
+    all_pieces
   end
 end
